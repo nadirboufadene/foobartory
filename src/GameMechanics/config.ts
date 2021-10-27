@@ -1,0 +1,2 @@
+export const GAME_CLOCK_MS_MULTIPLIER = 1000;
+export const ROBOT_GOAL_AMOUNT = 30;
