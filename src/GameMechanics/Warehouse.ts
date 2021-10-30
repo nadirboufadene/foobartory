@@ -60,6 +60,7 @@ export class Warehouse {
   }
 
   private stopWarehouse(): void {
+    this.eventManager.dispatch(reportInventoryState(this.serialize()));
     this.eventManager.dispatch(missionAccomplished());
     this.eventManager.unhookEvents(this.listenerId);
   }
@@ -108,9 +109,6 @@ export class Warehouse {
    */
   private eventHandler(event: GameEvent): void {
     switch (event.type) {
-      case 'MISSION_ACCOMPLISHED':
-        this.stopWarehouse();
-        break;
       case 'REPORT_ROBOT_STATE_ASKED':
         this.sendRobotState(event.robot);
         break;
@@ -171,30 +169,29 @@ export class Warehouse {
    * Dispatch a Failure Event if the Foo element break
    * Dispatch a Failure Event if there is not enough ressources
    */
-  addFoobar(robotId: string): Foobar | null {
-    if (this.canAssembleFoobar()) {
-      if (Math.random() < 0.6) {
-        const foo = this.foos.pop();
-        const bar = this.bars.pop();
-        if (bar && foo) {
-          this.foobars.push({ foo: foo, bar: bar });
-          this.eventManager.dispatch(assemblingFoobarSuccess(robotId));
-        }
-      } else {
-        this.eventManager.dispatch(
-          assemblingFoobarFailure(robotId, 'Our foo element broke'),
-        );
-        // since the assembling failed we destroy the foo element in the inventory
-        this.foos.pop();
-        // we register the failure
-        this.numberOfWastedFoos++;
-      }
-    } else {
+  addFoobar(robotId: string): void {
+    if (!this.canAssembleFoobar()) {
       this.eventManager.dispatch(
         assemblingFoobarFailure(robotId, 'Not enough ressources'),
       );
+      return;
     }
-    return null;
+    if (Math.random() < 0.6) {
+      const foo = this.foos.pop();
+      const bar = this.bars.pop();
+      if (bar && foo) {
+        this.foobars.push({ foo: foo, bar: bar });
+        this.eventManager.dispatch(assemblingFoobarSuccess(robotId));
+      }
+    } else {
+      this.eventManager.dispatch(
+        assemblingFoobarFailure(robotId, 'Our foo element broke'),
+      );
+      // since the assembling failed we destroy the foo element in the inventory
+      this.foos.pop();
+      // we register the failure
+      this.numberOfWastedFoos++;
+    }
   }
 
   /**
@@ -202,22 +199,22 @@ export class Warehouse {
    * Dispatch a failure in case of a lack of ressources
    */
   addRobot(robotId: string, order: RobotOrder): void {
-    if (this.canBuyRobot()) {
-      this.moneySpent += ROBOT_EUROS_PRICE;
-      this.foos.splice(0, ROBOT_FOOS_PRICE);
-      this.bank -= ROBOT_EUROS_PRICE;
-      const newRobot = Robot.buildRobot(this, order, true);
-      this.robots.push(newRobot);
-      newRobot.start();
-      this.eventManager.dispatch(buyingNewBotSuccess(robotId));
-      this.eventManager.dispatch(newBotArrived(newRobot.serialize()));
-      // we dispatch an event saying the goal is reached
-      if (this.numberOfRobots === this.robotAmountGoal) this.stopWarehouse();
-    } else {
+    if (!this.canBuyRobot()) {
       this.eventManager.dispatch(
         buyingNewBotFailure(robotId, 'Not enough ressources'),
       );
+      return;
     }
+    this.moneySpent += ROBOT_EUROS_PRICE;
+    this.foos.splice(0, ROBOT_FOOS_PRICE);
+    this.bank -= ROBOT_EUROS_PRICE;
+    const newRobot = Robot.buildRobot(this, order, true);
+    this.robots.push(newRobot);
+    newRobot.start();
+    this.eventManager.dispatch(buyingNewBotSuccess(robotId));
+    this.eventManager.dispatch(newBotArrived(newRobot.serialize()));
+    // we dispatch an event saying the goal is reached
+    if (this.numberOfRobots === this.robotAmountGoal) this.stopWarehouse();
   }
 
   /**
@@ -225,15 +222,15 @@ export class Warehouse {
    * Dispatch a failure in case of a lack of ressources
    */
   sellFoobars(robotId: string, amount: number): void {
-    if (this.canSellFoobars(amount)) {
-      this.foobars.splice(0, amount);
-      this.bank += amount;
-      this.eventManager.dispatch(sellingFoobarSuccess(robotId, amount));
-    } else {
+    if (!this.canSellFoobars(amount)) {
       this.eventManager.dispatch(
         sellingFoobarFailure(robotId, 'Not enough ressources'),
       );
+      return;
     }
+    this.foobars.splice(0, amount);
+    this.bank += amount;
+    this.eventManager.dispatch(sellingFoobarSuccess(robotId, amount));
   }
 
   get storedFoos(): Foo[] {

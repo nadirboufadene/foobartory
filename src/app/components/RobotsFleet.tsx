@@ -24,6 +24,7 @@ function RobotsFleet(props: RobotsFleetProps) {
       if (event.type === 'NEW_ROBOT_ARRIVED')
         // we give setFleetState a function to avoid stale closure
         setFleetState(fleetState => [...fleetState, event.robot]);
+      if (event.type === 'MISSION_ACCOMPLISHED') unsubscribeEvent(listenerId);
     });
     return () => {
       unsubscribeEvent(listenerId);

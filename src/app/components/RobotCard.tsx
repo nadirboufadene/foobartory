@@ -24,9 +24,9 @@ function RobotCard(props: RobotProps) {
       if (
         event.type === 'REPORT_ROBOT_STATE_SENT' &&
         robotState.identifier === event.robot.identifier
-      ) {
+      )
         setRobotState(event.robot);
-      }
+      if (event.type === 'MISSION_ACCOMPLISHED') unsubscribeEvent(listenerId);
     });
     return () => {
       unsubscribeEvent(listenerId);

@@ -15,7 +15,7 @@ export interface ClockProps {
 
 function Clock({ subscribeEvent, unsubscribeEvent }: ClockProps): ReactElement {
   const [timerState, setTimerState] = useState(0);
-  const [isRunning, setIsRunning] = useState(true);
+  const [isRunning, setIsRunning] = useState(false);
 
   let timerID: NodeJS.Timer;
   useEffect(() => {
@@ -34,8 +34,10 @@ function Clock({ subscribeEvent, unsubscribeEvent }: ClockProps): ReactElement {
     const listenerId = uuid();
     subscribeEvent(listenerId, (event: GameEvent) => {
       if (event.type === 'MISSION_ACCOMPLISHED') {
+        unsubscribeEvent(listenerId);
         setIsRunning(false);
       }
+      if (event.type === 'GAME_STARTED') setIsRunning(true);
     });
     return () => {
       unsubscribeEvent(listenerId);

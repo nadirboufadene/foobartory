@@ -27,6 +27,7 @@ function Dashboard({
       if (event.type === 'REPORT_INVENTORY_STATE') {
         setInventoryState(event);
       }
+      if (event.type === 'MISSION_ACCOMPLISHED') unsubscribeEvent(listenerId);
     });
     return () => {
       unsubscribeEvent(listenerId);
