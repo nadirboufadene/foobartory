@@ -17,17 +17,13 @@ function Clock({ subscribeEvent, unsubscribeEvent }: ClockProps): ReactElement {
   const [timerState, setTimerState] = useState(0);
   const [isRunning, setIsRunning] = useState(false);
 
-  let timerID: NodeJS.Timer;
   useEffect(() => {
     if (isRunning) {
-      timerID = setInterval(
+      setTimeout(
         () => setTimerState(() => timerState + 1),
         1 * GAME_CLOCK_MS_MULTIPLIER,
       );
     }
-    return () => {
-      clearInterval(timerID);
-    };
   }, [isRunning, timerState]);
 
   useEffect(() => {
