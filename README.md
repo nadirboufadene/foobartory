@@ -1,5 +1,5 @@
-# Foobartory for Alma By Nadir Boufadene
-For this project I chose a microservice approach with each entity communicating through events similarly as what we would do with signals in Django (Python framework) between apps. This is a lightweight implementation of the Event Sourcing architechtural design pattern. I chose this pattern because Alma's core business is highly transactional (payment).
+# Foobartory
+For this project I chose a microservice approach with each entity communicating through events similarly as what we would do with signals in Django (Python framework) between apps. This is a lightweight implementation of the Event Sourcing architechtural design pattern.
 
 For the interface I chose reactjs (without redux this time) to render a simple (arguably ugly) yet effective interface to display the game's state. And also because React is component oriented and this is perfectly adapted to Event Sourcing's paradigm (as we can see with the usage of redux for example).
 
