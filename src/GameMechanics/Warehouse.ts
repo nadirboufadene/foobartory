@@ -269,3 +269,5 @@ export class Warehouse {
     return this.bank;
   }
 }
+
+export default Warehouse;

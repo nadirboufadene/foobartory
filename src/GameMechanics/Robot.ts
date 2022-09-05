@@ -110,7 +110,7 @@ export class Robot {
   }
 
   /**
-   * Serialize the fleet to be sent to the interface
+   * Serialize the robot to be sent to the interface
    */
   serialize(): SerializedRobot {
     return {
@@ -202,3 +202,5 @@ export class Robot {
     }, this.getTaskTimer('CHANGE_TASK'));
   }
 }
+
+export default Robot;

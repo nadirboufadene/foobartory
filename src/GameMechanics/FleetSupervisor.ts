@@ -186,7 +186,7 @@ export class FleetSupervisor {
     if (!changedTask) this.resumeMission(robot);
   }
 
-  getNewOrders(robotId: string): void {
+  private getNewOrders(robotId: string): void {
     const robot = this.warehouse.robotsFleet.find(
       robot => robot.identifier === robotId,
     );
@@ -195,3 +195,5 @@ export class FleetSupervisor {
     else this.strategyPhaseTwo(robot);
   }
 }
+
+export default FleetSupervisor;
